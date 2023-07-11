@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- load static files -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'bad_login.css' %}" >
+</head>
+
+<body>
+    
+<div class="error">
+    <h1>Username or password is incorrect</h1>
+    <br><br>
+    <button class="back"><a href="{% url 'login' %}">Back</a></button>
+</div>
+   
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-do-List</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'edit.css' %}">
+    
+  </head>
+  <body>
+    <h3>Editing</h3>
+
+    <form action="" method="post" class="edit_form">
+      {% csrf_token %}
+      <p style="display: none;">User: {{form.user}}</p>
+      <p>{{user}}'s tasks</p>
+      Title:{{form.name}}<br><br> 
+      Description:{{form.description}}<br>
+      Complete: {{form.complete}}<br><br>
+      Due Date: {{form.due_date}}<br><br>
+      Due Time: {{form.time}}<br><br>
+      {{form.future_date}}<br><br>
+      <input type="submit" value="EDIT">
+      <br>
+      <a href="{% url 'index' %}">Back</a>
+    </form>
+
+
+    <script>
+      const dateField = document.querySelector('#id_due_date');
+      const timeField = document.querySelector('#id_time');
+      const hiddenField = document.querySelector('#id_future_date');
+      hiddenField.setAttribute('type', 'hidden');
+
+      function updateDateTime(){
+        const dateValue = dateField.value;
+        const timeValue = timeField.value;
+        if(dateValue && timeValue){
+          const dateTimeValue = new Date(`${dateValue}T${timeValue}`);
+          hiddenField.value = dateTimeValue.toISOString();
+        }
+      }
+      dateField.addEventListener('input', updateDateTime);
+      timeField.addEventListener('input', updateDateTime);
+    </script>
+
+  </body>
+</html>

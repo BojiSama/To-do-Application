@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-do-List</title>
+    <!-- load static files -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'index.css' %}">
+</head>
+
+<body>
+    <div class="bar">
+       
+        <h3 id="task">Task </h3><h3 id="trackr">Trackr</h3>
+    </div>
+    <header>
+        <h1>Task<span>Trackr</span></h1>
+        <!-- style for the marquee behavior -->
+        <style>
+        .marquee {
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .marquee span {
+            display: inline-block;
+            padding-left: 100%;
+            animation: marquee 15s linear infinite;
+        }
+
+        @keyframes marquee {
+            0%   { transform: translate(0, 0); }
+            100% { transform: translate(-100%, 0); }
+        }
+
+        h2.name_of_user {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #053045;
+        } 
+    </style>
+        <h2 class="name_of_user">
+            <div class="marquee">
+                <span>Welcome {{user}}! <input type="hidden" id="name" value="{{ username }}"></span>
+            </div>
+            <br>
+        </h2>
+        <br>
+        <form id="task_bar" method="POST">
+            {% csrf_token %}
+            <input type="text" id="task_bar_input" name="task_name" placeholder="Enter your task here" required/>
+            <input type="submit" id="new_task_submit" value="ADD TASK" />
+        </form>
+    </header>
+    <br>
+    <main>
+        <section class="Tasks_List">
+            <h2>Tasks</h2>
+            <br>
+            <script>
+                window.onload = timer;
+
+                function timer(){
+                    var N = document.querySelectorAll('[id^=ftime]').length; // all elements with id starting with ftime
+                    
+                    for(var i = 0; i < N; i++){
+                        var nn = document.getElementById("ftime"+i.toString()).innerHTML; // get elemets with ids ftime0, ftime1, etc and get their innerHTML
+                        
+                        var futureDate = new Date(`${nn}`);
+                        var now = new Date();
+                        var timeLeft = futureDate - now; // time in milliseconds
+                        // kept repeating the timeLeft/1000 so as not to lose the accuracy due to 'flooring'
+                        var secondsLeft = Math.floor((timeLeft/1000)%60); // seconds = (milliseconds/10000) mod 60
+                        var minutesLeft = Math.floor((timeLeft/(1000*60))%60); // minutes = (seconds/60) mod 60
+                        var hoursLeft   = Math.floor((timeLeft/(1000*60*60))%24); // hours = (minutes/60) mod 24
+                        var daysLeft    = Math.floor(timeLeft/(1000*60*60*24)); // days = hours/24
+                        
+                        // create a timeLeftString that we eventually display
+                        var timeLeftString = "";
+
+                        if(daysLeft > 0)
+                            timeLeftString += daysLeft + " days, ";
+                        if(hoursLeft > 0)
+                            timeLeftString += hoursLeft + " hours, ";
+                        if(minutesLeft > 0)
+                            timeLeftString += minutesLeft + " mins, ";
+                        if(secondsLeft > 0)
+                            timeLeftString += secondsLeft + " seconds";
+                        if(timeLeftString == "")
+                            timeLeftString = "expired!";
+
+                        // write the timeLeftString to elements with ids 'time-left0, time-left1 ...'
+                        document.getElementById("time-left"+i.toString()).innerHTML = timeLeftString;
+                    }
+                }
+
+                setInterval(timer, 1000); // repeat every second
+            </script>
+            <div id="Tasks">
+                {% if tasks %}
+                    {% for task in tasks %}
+                        <div id="tasks_done">
+                            <div class="list_content">
+                                <p id="task_name">
+                                    {% if task.complete %}
+                                        <strike>{{task.name|capfirst}}</strike>
+                                    {% else %}
+                                        {{task.name|upper}}
+                                        <br>
+                                    {% endif %}
+                                </p>
+                                <p>Created: {{task.created}}</p>
+                                <p style="display:none;">Time left: {{task.future_date|timeuntil}}</p>
+                              
+                                <!-- generate p-tags with unique ids starting with ftime e.g. ftime0, ftime1 etc -->
+                                <p id="ftime{% cycle '0' '1' '2' '3' '4' '5' '6' '7' '8' '9' '10' '11' '12' '13' '14' '15' '16' '17' '18' '19' '20' %}" style="display:none;">{{task.future_date.isoformat}}</p>
+                                <p>Time Due: {{task.future_date}}</p>
+                            
+                                <!-- ditto, time-left0, time-left1 ... -->
+                                <p>Time Left: <span id="time-left{% cycle '0' '1' '2' '3' '4' '5' '6' '7' '8' '9' '10' '11' '12' '13' '14' '15' '16' '17' '18' '19' '20' %}"></span></p>
+                                <br>
+                            </div> 
+                            <div class="action_buttons">
+                                <!-- edit button -->
+                                <button class="edit"><a href="{% url 'edit_task' task.id%}">EDIT</a></button><br><br>
+                                <!-- delete button -->
+                                <button class="delete"><a href="{% url 'delete_task' task.id%}">DELETE</a></button>
+                            </div>
+                            <div hx-get></div>
+                        </div>
+                        <hr>
+                    {% endfor %}
+                {% else %}
+                    <p>No tasks yet.</p>
+                {% endif %}
+            </div>    
+        </section>
+    </main>
+
+    <footer>
+        <a href="{% url 'logout' %}">Logout</a>
+    </footer>
+       
+
+</body>
+</html>
